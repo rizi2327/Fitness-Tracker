@@ -1,9 +1,15 @@
 import styled, {ThemeProvider} from "styled-components"
 import { lightTheme } from "./utils/Themes";
-import {BrowserRouter} from "react-router-dom"
+import {BrowserRouter, Route, Routes} from "react-router-dom"
 import Authentication from "./pages/Authentication";
 import Navbar from "./components/Navbar";
 import { useState } from "react";
+import { Dashboard } from "@mui/icons-material";
+import DashBoard from "./pages/DashBoard";
+import Workouts from "./pages/Workouts";
+import Tutorials from "./pages/Tutorials";
+import Blogs from "./pages/Blogs";
+import Contact from "./pages/Contact";
 
 
 const Container = styled.div`
@@ -27,6 +33,13 @@ function App() {
       {user ? (
         <Container>
           <Navbar/>
+         <Routes>
+           <Route path="/" element={<DashBoard/>}/>
+           <Route path="/workouts" element={<Workouts/>}/>
+           <Route path="/tutorials" element={<Tutorials/>}/>
+           <Route path="/blogs" element={<Blogs/>}/>
+           <Route path="/contact" element={<Contact/>}/>
+         </Routes>
         </Container>
       ):(
      <Container>
