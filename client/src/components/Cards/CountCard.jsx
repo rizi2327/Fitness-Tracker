@@ -30,7 +30,7 @@ font-weight:600;
 font-size:16px;
 color:${({theme})=>theme.primary};
 @media(max-width:600px){
-font-size:12px;
+font-size:14px;
 }`;
 
 const Value=styled.div`
@@ -79,13 +79,13 @@ font-size:12px;
 }
 `;
 
-const CountCard = ({ item }) => {
+const CountCard = ({ item,data }) => {
   return (
     <Card>
         <Left>
             <Title>{item.name}</Title>
             <Value>
-              1200
+              {data && data[item.key].toFixed(2)}
               <Unit>{item.unit}</Unit>
               <Span positive>(+10%)</Span>
             </Value>

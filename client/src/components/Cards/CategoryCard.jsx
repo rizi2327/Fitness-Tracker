@@ -1,3 +1,5 @@
+import { Padding } from '@mui/icons-material';
+import { PieChart } from '@mui/x-charts';
 import { BarChart } from '@mui/x-charts/BarChart';
 // import { BarChart } from '@mui/icons-material';
 import React from 'react'
@@ -26,17 +28,29 @@ color:${({theme})=>theme.primary};
 font-size:14px;
 }`;
 
-const WeeklyStatCard = ({data}) => {
+const CategoryChart = ({data}) => {
   return (
     <Card>
       <Title>Weekly Calories Burned</Title>
-      {data?.totalWeeksCaloriesBurnt && (
-        <BarChart
-        xAxis={[{
-            scaleType:"band",
-            data:data?.totalWeeksCaloriesBurnt?.weeks
+      {data?.pieChartData && (
+        <PieChart
+        series={[{
+            data:data?.pieChartData,
+            innerRadius:30,
+            outerRadius:140,
+            paddingAngle:5,
+            cornerRadius:5,
         }]}
-        series={[{data:data?.totalWeeksCaloriesBurnt?.CaloriesBurned}]}
+        slotProps={{
+            legend:{
+                direction:'row',
+                position:{vertical:'bottom',horizontal:'middle'},
+                padding:0,
+                labelStyle:{
+                    fontSize:'12px',
+                }
+            }
+        }}
         height={300}
         />
       )}
@@ -44,4 +58,4 @@ const WeeklyStatCard = ({data}) => {
   )
 }
 
-export default WeeklyStatCard
+export default CategoryChart

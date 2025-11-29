@@ -1,8 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 import { counts } from '../utils/data.jsx';
 import CountCard from '../components/Cards/CountCard';
 import WeeklyStatCard from '../components/Cards/WeeklyStatCard.jsx';
+import CategoryChart from '../components/Cards/CategoryCard.jsx';
+import AddWorkout from '../components/AddWorkout.jsx';
+import WorkoutCard from '../components/Cards/WorkoutCard.jsx';
 
 const Container=styled.div`
 flex:1;
@@ -36,7 +39,29 @@ padding:0px 16px;
 @media (max-width:600px){
 gap:12px}
 `;
+
+const Section=styled.div`
+display:flex;
+flex-direction:column;
+padding:0px 16px;
+gap:22px;
+@media(max-wwidth:600px){
+gap:12px;}
+`;
+
+const CardWrapper=styled.div`
+display:flex;
+flex-wrap:wrap;
+justify-content:center;
+gap:20px;
+margin-bottom:100px;
+@media (max-width:600px)
+{
+gap:12px;
+}`;
+
 const DashBoard = () => {
+  const [workout,setWorkout]=useState("")
   const data={
     "totalCaloriesBurnt":13000,
     "totalWorkouts":6,
@@ -66,22 +91,22 @@ const DashBoard = () => {
       {
         "id":0,
         "value":6000,
-        "lable":"Legs"
+        "label":"Legs"
       },
       {
         "id":1,
         "value":1500,
-        "lable":"Back"
+        "label":"Back"
       },
       {
         "id":2,
         "value":3750,
-        "lable":"Shoulder"
+        "label":"Shoulder"
       },
       {
         "id":3,
         "value":2250,
-        "lable":"ABS"
+        "label":"ABS"
       },
     ]
 
@@ -92,12 +117,22 @@ const DashBoard = () => {
             <Title>Dashboard</Title>
             <Flexwrap>
               {counts.map((item)=>(
-              <CountCard item={item}/>
+              <CountCard item={item}  data ={data}/>
               ))}
             </Flexwrap>
             <Flexwrap>
               <WeeklyStatCard data={data}/>
+              <CategoryChart data={data}/>
+              <AddWorkout workout={workout} setWorkout={setWorkout}/>
             </Flexwrap>
+            <Section>
+                <Title>Today's Workouts</Title>
+                <CardWrapper>
+                  <WorkoutCard/>
+                  <WorkoutCard/>
+                  <WorkoutCard/>
+                </CardWrapper>
+            </Section>
         </Wrapper>
     </Container>
   )
