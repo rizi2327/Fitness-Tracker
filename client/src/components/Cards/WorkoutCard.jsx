@@ -8,7 +8,7 @@ min-width:280px;
 padding:24px;
 border:1px solid ${({theme})=>theme.text_primary};
 border-radius:14px;
-box-shadow:1px 6px 20px 0px ${({theme})=>theme.text_secondary};
+box-shadow:1px 4px 8px 0px ${({theme})=>theme.text_secondary};
 display:flex;
 flex-direction:column;
 gap:6px;
