@@ -1,0 +1,2 @@
+database password:OBvsYcSbOew593pe
+user:mrmrkhan10000_db_user
