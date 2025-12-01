@@ -2,11 +2,15 @@ import express from "express";
 import * as dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
+import userRoutes from "../server/routes/User.route.js";
+
+
 
 dotenv.config();
 
 //set port 
-const port=process.env.PORT || 8080;
+// const port=process.env.PORT || 8080;
+const port=8080;
 if(!port)
 {
     console.log("port is not defined")
@@ -21,6 +25,11 @@ app.use(express.urlencoded({extended:true}));
 
 
 //error handler
+
+
+//api use in index
+app.use('/api/v1/users',userRoutes)
+
 app.use((err,req,res,next)=>{
     const status=err.status || 500;
     const message=err.message || "something went wrong";
@@ -32,14 +41,13 @@ app.use((err,req,res,next)=>{
 })
 
 
-
 //create a get method
-app.get('/',async(req,res)=>{
-    res.status(200).json({
-        status:200,
-        message:"Hello ali"
-    })
-})
+// app.get('/',async(req,res)=>{
+//     res.status(200).json({
+//         status:200,
+//         message:"Hello ali"
+//     })
+// })
 
 const connectDB=async()=>{
         mongoose.set('strictQuery',true);
