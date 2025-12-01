@@ -7,7 +7,7 @@ import Workout from '../models/Workout.model.js';
 
 // dotenv.config(); ye 1 time hi use hota hai index ya app js mn
 
-
+//user register controller
 export const UserRegister= async(req,res,next)=>{
     try {
 
@@ -58,6 +58,8 @@ export const UserRegister= async(req,res,next)=>{
     
 }
 
+
+//user login controller
 export const UserLogin=async(req,res,next)=>{
     try {
 
@@ -97,5 +99,19 @@ export const UserLogin=async(req,res,next)=>{
     } catch (error) {
         //send error to next middleware like global error handler
             next(error)
+    }
+}
+
+//user get profile / Dashboard
+export const UserDashboard=async(req,res,next)=>{
+    try {
+        const  userId=req.user?.id;
+        const user = await User.findById(userId)
+        if(!user)
+        {
+            return next(createError(404,"user not found"));
+        }
+    } catch (error) {
+        next(error);
     }
 }
