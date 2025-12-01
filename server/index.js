@@ -19,6 +19,20 @@ app.use(express.urlencoded({extended:true}));
 
 // yhn tak ap almost har project mn krty hain...
 
+
+//error handler
+app.use((err,req,res,next)=>{
+    const status=err.status || 500;
+    const message=err.message || "something went wrong";
+    return res.status(status).json({
+        success:false,
+        status,
+        message
+    })
+})
+
+
+
 //create a get method
 app.get('/',async(req,res)=>{
     res.status(200).json({
