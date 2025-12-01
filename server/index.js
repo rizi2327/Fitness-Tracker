@@ -24,21 +24,14 @@ app.use(express.urlencoded({extended:true}));
 // yhn tak ap almost har project mn krty hain...
 
 
-//error handler
+
 
 
 //api use in index
 app.use('/api/v1/users',userRoutes)
 
-app.use((err,req,res,next)=>{
-    const status=err.status || 500;
-    const message=err.message || "something went wrong";
-    return res.status(status).json({
-        success:false,
-        status,
-        message
-    })
-})
+
+
 
 
 //create a get method
@@ -62,6 +55,17 @@ const connectDB=async()=>{
 
 }
 
+//Global error handler jo globally error ko handdle krta hai
+//it catches all error and then hand through error in proper formate
+app.use((err,req,res,next)=>{
+    const status=err.status || 500;
+    const message=err.message || "something went wrong";
+    return res.status(status).json({
+        success:false,
+        status,
+        message
+    })
+})
 
 //server start function
 const startServer=async()=>

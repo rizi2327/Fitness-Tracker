@@ -37,18 +37,18 @@ export const UserRegister= async(req,res,next)=>{
     //save new use in data base
     const createdUser = await user.save();
 
-    //create jwt token for user login decison that how much user the login 
+    //create jwt token for user login decison that how much time user the login 
     const token=jwt.sign({id :createdUser._id},process.env.JWT,{
         expiresIn:"9999 years"
     });
 
     //send response with token and user
-    return res.status(200)
+    return res
+    .status(200)
     .json({
-        token,user
+        token,
+        user
     });
-
-
     } catch (error) {
         next(err);
     }
@@ -56,4 +56,46 @@ export const UserRegister= async(req,res,next)=>{
     
 
     
+}
+
+export const UserLogin=async(req,res,next)=>{
+    try {
+
+        //take data from front end
+        const {email,password} =req.body;
+        
+        //find user from data base
+        const user=await User.findOne({email});
+        if(!user)
+        {
+            return next(createError(404,"user not found"));
+        }
+
+        console.log(password,user);
+        //compare password / check password 
+        const isPasswordCorrect=await bcrypt.compare(password,user.password);
+        if(!isPasswordCorrect)
+        {
+            return next(createError(403,'Incorrect Password'))
+        }
+
+        //create json web token
+        const token = jwt.sign({id:user._id}, process.env.JWT,
+            {expiresIn:"9999 years"}
+        );
+        
+
+        //send response
+         return res
+         .status(200)
+         .json({
+            message:"user is successfully loged In",
+            token,
+            user
+         })
+
+    } catch (error) {
+        //send error to next middleware like global error handler
+            next(error)
+    }
 }
