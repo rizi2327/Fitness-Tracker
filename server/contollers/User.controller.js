@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import {createError} from '../error.js';
 import User from '../models/User.model.js';
 import Workout from '../models/Workout.model.js';
+import Workout from "../models/Workout.model.js";
 
 // dotenv.config(); ye 1 time hi use hota hai index ya app js mn
 
@@ -105,12 +106,61 @@ export const UserLogin=async(req,res,next)=>{
 //user get profile / Dashboard
 export const UserDashboard=async(req,res,next)=>{
     try {
+
+        //take userId from verify user by auth middleware
         const  userId=req.user?.id;
+        //find this user from datbase
         const user = await User.findById(userId)
         if(!user)
         {
             return next(createError(404,"user not found"));
         }
+
+        //today ka user ka data collect krn  kly user date set krna 
+        const currentDateFormatted = new Date();
+        const startToday =  new Date(
+            currentDateFormatted.getFullYear(),
+            currentDateFormatted.getMonth(),
+            currentDateFormatted.getDate(),
+        );
+        const endToday= new Date(
+            currentDateFormatted.getFullYear(),
+            currentDateFormatted.getMonth(),
+            currentDateFormatted.getDate(),
+        )
+        //calculate burnt calories today
+        const totalCaloriesBurnt = await Workout.aggregate([
+            {
+                $match:
+                {
+                    user:user._id,
+                    date:{
+                        $gte:startToday,
+                        $lte:endToday,
+                    }
+                }
+            },
+            {
+                $group:
+                {
+                    _id:null,
+                    totalCaloriesBurnt:{
+                        $sum:"caloriesBurned"
+                    }
+                }
+            },
+        ]);
+        //total workout per day
+        const totalWorkout= await Workout.countDocuments({
+            user:user._id,
+            date:{
+                $gte:startToday,
+                $lte:endToday,
+            },
+        });
+
+        
+
     } catch (error) {
         next(error);
     }
