@@ -1,5 +1,6 @@
 import express from "express";
-import { UserLogin, UserRegister } from "../contollers/User.controller.js";
+import { UserDashboard, UserLogin, UserRegister } from "../contollers/User.controller.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 
 
 const router= express.Router();
@@ -7,6 +8,7 @@ const router= express.Router();
 // router.post("/signup",UserRegister);//commonly used 
 router.route('/signup').post(UserRegister);//used for multiple methods
 router.route('/login').post(UserLogin);
+router.route('/dashboard').get(verifyToken,UserDashboard);
 
 
 export default router;
