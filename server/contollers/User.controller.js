@@ -290,13 +290,68 @@ export const getWorkoutsByDate=async (req ,res ,next)=>{
             next(createError(401,"please login"));
         }
         const user= await User.findById(userId);
-        if(!user){
-            return next(404,"user not found")
-        }
-        console.log(req.query.date);
+        console.log(req.query.date);//req.query  url sy data  lena ka ek method hai 
         let date= req.query.date ? new Date(req.query.date) : new Date();
         console.log(date);
+         if(!user){
+            return next(404,"user not found")
+        };
+        const startOfDay= new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.date()
+        );
+        const endOfDay= (
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate()+1
+        );
+
+        const todayWorkouts = await Workout.find({
+            userId:userId,
+            date:{
+                $gte:startOfDay,
+                $lt:endOfDay,
+            }
+        });
+         const totalCaloriesBurnt = todayWorkouts.reduce((today,workout)=>{
+            total+ workout.caloriesBurned,0
+        });
+
+        return res
+        .status(200)
+        .json({
+            todayWorkouts,
+            totalCaloriesBurnt
+        })
         
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+
+//add workout
+export const addWorkout = async (req,res, next)=>{
+    try {
+        const userId=req.user?._id;
+        if(!userId)
+        {
+            return next(createError(401,'please login'))
+        }
+        const {workoutString} = req.body;
+        if(!workoutString)
+        {
+            return next(createError(400,"workout string missing"))
+        }
+        const eachworkout= workoutString.split(';').map((line)=>line.trim());
+        
+        const categories= eachworkout.filter((line)=>line.startsWith('#'))
+        if(categories.length ===0)
+        {
+            return next(createError(400,'no categories found  in workout string'))
+        }
     } catch (error) {
         next(error)
     }
