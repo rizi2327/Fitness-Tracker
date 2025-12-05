@@ -330,29 +330,137 @@ export const getWorkoutsByDate=async (req ,res ,next)=>{
     }
 }
 
-
-
-//add workout
-export const addWorkout = async (req,res, next)=>{
+// ADD WORKOUT CONTROLLER (FIXED VERSION)
+export const addWorkout = async (req, res, next) => {
     try {
-        const userId=req.user?._id;
-        if(!userId)
-        {
-            return next(createError(401,'please login'))
-        }
-        const {workoutString} = req.body;
-        if(!workoutString)
-        {
-            return next(createError(400,"workout string missing"))
-        }
-        const eachworkout= workoutString.split(';').map((line)=>line.trim());
+        const userId = req.user?.id; // userId = "user123"
+        const { workoutString } = req.body;
         
-        const categories= eachworkout.filter((line)=>line.startsWith('#'))
-        if(categories.length ===0)
-        {
-            return next(createError(400,'no categories found  in workout string'))
+        // workoutString example: 
+        // "#Chest\n-Bench Press\n-3 sets x 10 reps\n-50 kg\n-30 min"
+        
+        if (!workoutString) {
+            return next(createError(400, "Workout string is missing"));
         }
+
+        // Split by semicolon for multiple workouts
+        const eachworkout = workoutString.split(';').map((line) => line.trim());
+        
+        // Find categories (lines starting with #)
+        const categories = eachworkout.filter((line) => line.startsWith("#"));
+        
+        if (categories.length === 0) {
+            return next(createError(400, "No categories found in workout string"));
+        }
+
+        const parsedWorkouts = []; // Store parsed workouts
+        let currentCategory = ""; // Track current category
+        let count = 0; // Counter for workouts
+
+        // Process each workout block
+        for (const line of eachworkout) {
+            count++;
+            
+            if (line.startsWith("#")) {
+                // Split by newline and trim each part
+                const parts = line.split('\n').map((part) => part.trim());
+                console.log("Parts:", parts);
+                
+                // Check if all 5 parts exist
+                if (parts.length < 5) {
+                    return next(
+                        createError(400, `Workout string is missing for ${count}th workout`)
+                    );
+                }
+                
+                // Extract category (remove #)
+                currentCategory = parts[0].substring(1).trim();
+                
+                // Parse workout details
+                const workoutDetails = parseWorkoutLine(parts);
+                
+                if (workoutDetails === null) {
+                    return next(createError(400, "Please enter in proper format"));
+                }
+                
+                // Add category and store
+                workoutDetails.category = currentCategory;
+                parsedWorkouts.push(workoutDetails);
+                
+            } else {
+                return next(
+                    createError(400, `Workout string is missing for ${count}th workout`)
+                );
+            }
+        }
+
+        // Save each workout to database
+        for (const workout of parsedWorkouts) {
+            // Calculate calories
+            workout.caloriesBurned = parseFloat(calculateCaloriesBurnt(workout));
+            
+            // Save to database
+            await Workout.create({
+                ...workout,
+                user: userId
+            });
+        }
+
+        return res.status(201).json({
+            message: "Workouts added successfully",
+            workouts: parsedWorkouts
+        });
+        
     } catch (error) {
-        next(error)
+        next(error);
     }
-}
+};
+
+// HELPER FUNCTION: Parse workout line
+const parseWorkoutLine = (parts) => {
+    const details = {};
+    
+    if (parts.length >= 5) {
+        // Extract workout name (remove -)
+        details.workoutName = parts[1].substring(1).trim();
+        
+        // Extract sets and reps from parts[2]
+        const setsRepsPart = parts[2].substring(1); // Remove leading -
+        const setsRepsMatch = setsRepsPart.match(/(\d+)\s*sets\s*x\s*(\d+)\s*reps/);
+        
+        if (!setsRepsMatch) {
+            return null; // Invalid format
+        }
+        
+        details.sets = parseInt(setsRepsMatch[1]); // First number
+        details.reps = parseInt(setsRepsMatch[2]); // Second number
+        
+        // Extract weight (remove - and kg)
+        details.weight = parseFloat(
+            parts[3].substring(1).replace('kg', '').trim()
+        );
+        
+        // Extract duration (remove - and min)
+        details.duration = parseFloat(
+            parts[4].substring(1).replace('min', '').trim()
+        );
+        
+        return details;
+    }
+    
+    return null;
+};
+
+// HELPER FUNCTION: Calculate calories
+const calculateCaloriesBurnt = (workoutDetails) => {
+    const durationInMinutes = parseInt(workoutDetails.duration);
+    const weightInKg = parseInt(workoutDetails.weight);
+    const caloriesBurntPerMinute = 5; // Simplified formula
+    
+    return durationInMinutes * caloriesBurntPerMinute * weightInKg;
+};
+
+
+
+
+
