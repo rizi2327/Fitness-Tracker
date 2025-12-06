@@ -58,4 +58,4 @@ export const {
 console.log(userSlice.actions)
 // Export reducer (✅ FIXED)
 export default userSlice.reducer;
-console.login(userSlice.reducer);
+console.log(userSlice.reducer);
