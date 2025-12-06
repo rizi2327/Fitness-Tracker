@@ -3,13 +3,14 @@ import { lightTheme } from "./utils/Themes";
 import {BrowserRouter, Route, Routes} from "react-router-dom"
 import Authentication from "./pages/Authentication";
 import Navbar from "./components/Navbar";
-import { useState } from "react";
+
 import { Dashboard } from "@mui/icons-material";
 import DashBoard from "./pages/DashBoard";
 import Workouts from "./pages/Workouts";
 import Tutorials from "./pages/Tutorials";
 import Blogs from "./pages/Blogs";
 import Contact from "./pages/Contact";
+import { useSelector } from "react-redux";
 
 
 const Container = styled.div`
@@ -25,14 +26,14 @@ transition:all 0.2s ease`
 
 function App() {
 
-  const [user,setUser]=useState(true) 
+const {currentUser} = useSelector((state)=>state.user)
   return (
     <>
     <ThemeProvider theme={lightTheme}>
       <BrowserRouter>
-      {user ? (
+      {currentUser ? (
         <Container>
-          <Navbar/>
+          <Navbar currentUser={currentUser}/>
          <Routes>
            <Route path="/" element={<DashBoard/>}/>
            <Route path="/workouts" element={<Workouts/>}/>
