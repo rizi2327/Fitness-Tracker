@@ -1,6 +1,7 @@
-  import React from 'react'
+  import React, { useState } from 'react'
 import styled from 'styled-components'
 import TextInput from './TextInput';
+import Button from './Button';
 import { UserSignIn } from '../api';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../redux/reducer/userSlice';
@@ -24,7 +25,7 @@ import { loginSuccess } from '../redux/reducer/userSlice';
   const SingIn = () => {
     const dispatch= useDispatch()
     const [email,setEmail]=useState('');
-    const [loading,setLoading]= userState(false);
+    const [loading,setLoading]= useState(false);
     const [buttonDisabled,setButtonDisabled]=useState(false)
     const [password,setPassword]=useState('');
     const validateInputs = ()=>{
@@ -44,12 +45,12 @@ import { loginSuccess } from '../redux/reducer/userSlice';
         .then((res)=>{
           dispatch(loginSuccess(res.data));
           alert("Login success");
-          loading(false);
+          setLoading(false);
           setButtonDisabled(false);
         })
         .catch((err)=>
         {
-          alert(err.response.data.message);
+          alert(err.response?.data?.message|| "something went wrong");
           setLoading(false);
           setButtonDisabled(false);
         })
@@ -62,7 +63,7 @@ import { loginSuccess } from '../redux/reducer/userSlice';
         <Span>Please login with your details here</Span>
       </div>
       <div style={{
-        display:flex,
+        display:'flex',
         gap:'20px',
         flexDirection:'column'
       }}>
@@ -80,7 +81,9 @@ import { loginSuccess } from '../redux/reducer/userSlice';
         text="SignIn"
         onClick={handleSignIn}
         isLoading={loading}
-        isDisabled={buttonDisabled}/>
+        isDisabled={buttonDisabled}
+        type="primary"
+        full/>
       </div>
      </Container>
     )

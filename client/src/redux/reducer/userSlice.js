@@ -54,8 +54,4 @@ export const {
     setError, 
     updateUser 
 } = userSlice.actions;
-
-console.log(userSlice.actions)
-// Export reducer (✅ FIXED)
 export default userSlice.reducer;
-console.log(userSlice.reducer);
