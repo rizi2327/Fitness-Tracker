@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components';
 import TextInput from "./TextInput";
 import Button from "./Button";
+import SingIn from './SingIn';
 
 
 const Container=styled.div`
