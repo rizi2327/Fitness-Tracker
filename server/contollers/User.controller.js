@@ -389,6 +389,7 @@ export const addWorkout = async (req, res, next) => {
                 // Add category and store
                 workoutDetails.category = currentCategory;
                 parsedWorkouts.push(workoutDetails);
+                console.log('✅ Parsed workout:', { workoutDetails, currentCategory });
                 
             } else {
                 return next(
@@ -401,11 +402,20 @@ export const addWorkout = async (req, res, next) => {
         for (const workout of parsedWorkouts) {
             // Calculate calories
             workout.caloriesBurned = parseFloat(calculateCaloriesBurnt(workout));
+            console.log('💥 Calculating calories for:', workout.workoutName, '=', workout.caloriesBurned);
             
-            // Save to database
-            await Workout.create({
+        // Save each workout to database (explicitly set date to today)
+            const savedWorkout = await Workout.create({
                 ...workout,
-                user: userId
+                user: userId,
+                date: new Date()
+            });
+            console.log('✅ Workout saved:', { 
+                workoutName: workout.workoutName, 
+                caloriesBurned: workout.caloriesBurned,
+                duration: workout.duration,
+                weight: workout.weight,
+                savedId: savedWorkout._id 
             });
         }
 
@@ -457,11 +467,12 @@ const parseWorkoutLine = (parts) => {
 
 // HELPER FUNCTION: Calculate calories
 const calculateCaloriesBurnt = (workoutDetails) => {
-    const durationInMinutes = parseInt(workoutDetails.duration);
-    const weightInKg = parseInt(workoutDetails.weight);
+    const durationInMinutes = parseFloat(workoutDetails.duration);
+    const weightInKg = parseFloat(workoutDetails.weight);
     const caloriesBurntPerMinute = 5; // Simplified formula
-    
-    return durationInMinutes * caloriesBurntPerMinute * weightInKg;
+    const calories = durationInMinutes * caloriesBurntPerMinute * weightInKg;
+    console.log(`📊 Calc: ${durationInMinutes} min × 5 cal/min × ${weightInKg} kg = ${calories} kcal`);
+    return calories;
 };
 
 
