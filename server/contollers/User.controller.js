@@ -153,7 +153,7 @@ export const UserDashboard=async(req,res,next)=>{
                 {
                     _id:null,
                     totalCaloriesBurnt:{
-                        $sum:"caloriesBurned"
+                        $sum:"$caloriesBurned"
                     }
                 }
             },
@@ -193,7 +193,7 @@ export const UserDashboard=async(req,res,next)=>{
             {
                 $group:{
                     _id:"$category",
-                    totalCaloriesBurnt:{$sum:"$caloriesBurned"}
+                    totalCaloriesBurnt: {$sum: "$caloriesBurned" }
                 }
             }
         ]);

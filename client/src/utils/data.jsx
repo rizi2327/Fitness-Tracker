@@ -6,10 +6,9 @@ import {
 
 export const counts = [
   {
+    id:1,
     name: "Calories Burned",
-    icon: (
-      <LocalFireDepartmentRounded sx={{ color: "inherit", fontSize: "26px" }} />
-    ),
+    icon: <LocalFireDepartmentRounded sx={{ color: "inherit", fontSize: "26px" }} />,
     desc: "Total calories burned today",
     key: "totalCaloriesBurnt",
     unit: "kcal",
@@ -17,15 +16,17 @@ export const counts = [
     lightColor: "#FDF4EA",
   },
   {
+    id:2,
     name: "Workouts",
     icon: <FitnessCenterRounded sx={{ color: "inherit", fontSize: "26px" }} />,
     desc: "Total no of workouts for today",
-    key: "totalWorkouts",
+    key: "totalWorkout",   // ✅ FIXED
     unit: "",
     color: "#41C1A6",
     lightColor: "#E8F6F3",
   },
   {
+    id:3,
     name: "Average  Calories Burned",
     icon: <TimelineRounded sx={{ color: "inherit", fontSize: "26px" }} />,
     desc: "Average Calories Burned on each workout",
@@ -35,3 +36,4 @@ export const counts = [
     lightColor: "#FEF3F9",
   },
 ];
+
