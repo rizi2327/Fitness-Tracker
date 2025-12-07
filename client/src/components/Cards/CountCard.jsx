@@ -1,6 +1,4 @@
 
-import { Container } from '@mui/material'
-import React from 'react'
 import styled from 'styled-components';
 
 const Card=styled.div`
@@ -56,7 +54,7 @@ font-size:16px;
 {
 font-size:14px;
 }
-${({positive, theme})=>  positive? `color:${theme.green};`: `color:${theme.red};` }`;
+${({$positive, theme})=>  $positive? `color:${theme.green};`: `color:${theme.red};` }`;
 
 const Icon=styled.div`
 height:fit-content;
@@ -65,9 +63,9 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:12px
-${({color,bg})=>
-`background:${bg};
-color:${color};`}`;
+${({$color,$bg})=>
+`background:${$bg};
+color:${$color};`}`;
 
 const Desc=styled.div`
 font-size:14px;
@@ -80,20 +78,23 @@ font-size:12px;
 `;
 
 const CountCard = ({ item,data }) => {
+  const value  = data && data[item.key] !=null
+  ? Number(data[item.key]).toFixed(2)
+  :"0.00";
   return (
     <Card>
         <Left>
             <Title>{item.name}</Title>
             <Value>
-              {data && data[item.key].toFixed(2)}
+              {value}
               <Unit>{item.unit}</Unit>
-              <Span positive>(+10%)</Span>
+              <Span $positive={true}>(+10%)</Span>
             </Value>
             <Desc>
               {item.desc}
             </Desc>
         </Left>
-       <Icon color={item.color} bg={item.lightColor}>
+       <Icon $color={item.color} $bg={item.lightColor}>
         {item.icon}
        </Icon>
     </Card>

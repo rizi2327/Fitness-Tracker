@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { counts } from '../utils/data.jsx';
 import CountCard from '../components/Cards/CountCard';
@@ -6,6 +6,7 @@ import WeeklyStatCard from '../components/Cards/WeeklyStatCard.jsx';
 import CategoryChart from '../components/Cards/CategoryCard.jsx';
 import AddWorkout from '../components/AddWorkout.jsx';
 import WorkoutCard from '../components/Cards/WorkoutCard.jsx';
+import { addWorkout,getWorkouts,getDashboradData } from '../api/index.js';
 
 const Container=styled.div`
 flex:1;
@@ -61,76 +62,91 @@ gap:12px;
 }`;
 
 const DashBoard = () => {
-  const [workout,setWorkout]=useState("")
-  const data={
-    "totalCaloriesBurnt":13000,
-    "totalWorkouts":6,
-    "avgCaloriesBurntPerWorkout":2250,
-    "totalWeeksCaloriesBurnt":
-    {
-      "weeks":[
-      "17th",
-      "18th",
-      "19th",
-      "20th",
-      "21th",
-      "22th",
-      "23th",
-    ],
-    "CaloriesBurned":[
-      10500,
-      0,
-      0,
-      0,
-      0,
-      0,
-      10500,
-    ]
-    },
-    "pieChartData":[
-      {
-        "id":0,
-        "value":6000,
-        "label":"Legs"
-      },
-      {
-        "id":1,
-        "value":1500,
-        "label":"Back"
-      },
-      {
-        "id":2,
-        "value":3750,
-        "label":"Shoulder"
-      },
-      {
-        "id":3,
-        "value":2250,
-        "label":"ABS"
-      },
-    ]
+  const [loading,setLoading]=useState(false);
+  const [buttonLoading,setButtonLoading]=useState(false);
+  const [data,setData]= useState({});
+  const [todaysWorkouts,setTodaysWorkouts]=useState([]);
+  const [workout,setWorkout]=useState(`#legs
+    -back squat
+    -5 setsX15 reps
+    -50 kg
+    -10 min
+    `);
 
-  }
+    const dashboardData= async()=>{
+      setLoading(true);
+      const token = localStorage.getItem('fittrack-app-token');
+      console.log("TOKEN =>", token);
+      try {
+        const res = await getDashboradData(token);
+        setData(res.data ?? {});
+        console.log(res.data);
+      } catch (err) {
+        console.error('dashboardData error', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    const addNewWorkout=async() => {
+      setButtonLoading(true);
+      const token = localStorage.getItem('fittrack-app-token');
+      try {
+        await addWorkout(token, { workoutString: workout });
+        await dashboardData();
+        await getTodaysWorkout();
+      } catch (err) {
+        console.error('addNewWorkout error', err);
+        alert(err.response?.data?.message || err.message || 'Something went wrong');
+      } finally {
+        setButtonLoading(false);
+      }
+    };
+
+  const getTodaysWorkout = async () => {
+    setLoading(true);
+    const token = localStorage.getItem("fittrack-app-token");
+    try {
+      const res = await getWorkouts(token, "");
+      // server returns `todayWorkouts` (no 's') so fall back safely
+      setTodaysWorkouts(res?.data?.todayWorkouts ?? []);
+      console.log(res.data);
+    } catch (err) {
+      console.error('getTodaysWorkout error', err);
+      setTodaysWorkouts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    useEffect(()=>{
+      dashboardData();
+      getTodaysWorkout();
+    },[])
+
   return (
     <Container>
         <Wrapper>
             <Title>Dashboard</Title>
             <Flexwrap>
-              {counts.map((item)=>(
-              <CountCard item={item}  data ={data}/>
+              {counts.map((item,index)=>(
+              <CountCard key={item.id ||index} item={item}  data ={data}/>
               ))}
             </Flexwrap>
             <Flexwrap>
               <WeeklyStatCard data={data}/>
               <CategoryChart data={data}/>
-              <AddWorkout workout={workout} setWorkout={setWorkout}/>
+              <AddWorkout workout={workout} setWorkout={setWorkout}
+              addNewWorkout={addNewWorkout}
+              buttonLoading={buttonLoading}/>
             </Flexwrap>
             <Section>
                 <Title>Today's Workouts</Title>
                 <CardWrapper>
-                  <WorkoutCard/>
-                  <WorkoutCard/>
-                  <WorkoutCard/>
+                {todaysWorkouts.map((workout,index)=>{
+                 return <WorkoutCard key={index} workout={workout}/>
+})}
+                  
                 </CardWrapper>
             </Section>
         </Wrapper>

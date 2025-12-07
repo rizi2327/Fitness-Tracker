@@ -52,20 +52,20 @@ gap:6px;`;
 
 
 
-const WorkoutCard = () => {
+const WorkoutCard = ({ workout }) => {
   return (
     <Card>
-        <Category>#legs</Category>
-        <Name>Back Squat</Name>
-        <Sets>Count:5sets X 10reps</Sets>
+        <Category>#{workout?.category}</Category>
+        <Name>{workout?.name}</Name>
+        <Sets>Count:{workout?.sets} sets X {workout?.reps} reps</Sets>
         <Flex>
             <Details>
                 <FitnessCenterRounded sx={{fontSize: "20px"}}/>
-                30kg
+                {workout?.weight} kg
             </Details>
             <Details>
                 <TimelapseRounded sx={{fontSize: "20px"}}/>
-                30kg
+                {workout?.duration} min
             </Details>
         </Flex>
     </Card>

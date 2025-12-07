@@ -284,46 +284,49 @@ export const UserDashboard=async(req,res,next)=>{
 //every day workout detail 
 export const getWorkoutsByDate=async (req ,res ,next)=>{
     try {
-        const userId=req.user?._id;
-        if(!userId)
-        {
-            next(createError(401,"please login"));
+        // token payload sets `{ id: ... }` so read `req.user?.id`
+        const userId = req.user?.id;
+        if (!userId) {
+            return next(createError(401, "please login"));
         }
-        const user= await User.findById(userId);
-        console.log(req.query.date);//req.query  url sy data  lena ka ek method hai 
-        let date= req.query.date ? new Date(req.query.date) : new Date();
+
+        const user = await User.findById(userId);
+        console.log('query.date:', req.query.date);
+        let date = req.query.date ? new Date(req.query.date) : new Date();
         console.log(date);
-         if(!user){
-            return next(404,"user not found")
-        };
-        const startOfDay= new Date(
+        if (!user) {
+            return next(createError(404, "user not found"));
+        }
+
+        const startOfDay = new Date(
             date.getFullYear(),
             date.getMonth(),
-            date.date()
+            date.getDate()
         );
-        const endOfDay= (
+        const endOfDay = new Date(
             date.getFullYear(),
             date.getMonth(),
-            date.getDate()+1
+            date.getDate() + 1
         );
 
         const todayWorkouts = await Workout.find({
-            userId:userId,
-            date:{
-                $gte:startOfDay,
-                $lt:endOfDay,
+            user: userId,
+            date: {
+                $gte: startOfDay,
+                $lt: endOfDay,
             }
         });
-         const totalCaloriesBurnt = todayWorkouts.reduce((today,workout)=>{
-            total+ workout.caloriesBurned,0
-        });
+
+        const totalCaloriesBurnt = todayWorkouts.reduce((total, workout) => {
+            return total + (workout.caloriesBurned || 0);
+        }, 0);
 
         return res
-        .status(200)
-        .json({
-            todayWorkouts,
-            totalCaloriesBurnt
-        })
+            .status(200)
+            .json({
+                todayWorkouts,
+                totalCaloriesBurnt
+            });
         
     } catch (error) {
         next(error)
@@ -425,8 +428,9 @@ const parseWorkoutLine = (parts) => {
         details.workoutName = parts[1].substring(1).trim();
         
         // Extract sets and reps from parts[2]
-        const setsRepsPart = parts[2].substring(1); // Remove leading -
-        const setsRepsMatch = setsRepsPart.match(/(\d+)\s*sets\s*x\s*(\d+)\s*reps/);
+        const setsRepsPart = parts[2].substring(1).trim(); // Remove leading - and trim
+        // Accept variations like '5 sets x 15 reps', '5 setsX15 reps', '5 sets×15 reps' (case-insensitive)
+        const setsRepsMatch = setsRepsPart.match(/(\d+)\s*sets\s*[xX×]\s*(\d+)\s*reps/i);
         
         if (!setsRepsMatch) {
             return null; // Invalid format
@@ -437,12 +441,12 @@ const parseWorkoutLine = (parts) => {
         
         // Extract weight (remove - and kg)
         details.weight = parseFloat(
-            parts[3].substring(1).replace('kg', '').trim()
+            parts[3].substring(1).toLowerCase().replace('kg', '').trim()
         );
-        
+
         // Extract duration (remove - and min)
         details.duration = parseFloat(
-            parts[4].substring(1).replace('min', '').trim()
+            parts[4].substring(1).toLowerCase().replace('min', '').trim()
         );
         
         return details;

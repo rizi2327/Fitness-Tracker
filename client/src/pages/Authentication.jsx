@@ -68,12 +68,12 @@ const Authentication = () => {
         <Right>{!login ?
         (<>
         <SignUp/>
-        <Text>Don't have an Account?<TextButton onClick={()=>setLogin(true)}>SignUP</TextButton></Text>
+        <Text>Don't have an Account?<TextButton onClick={()=>setLogin(true)}>SignIn</TextButton></Text>
         </>)
         :
         (<>
         <SingIn/>
-        <Text>Already  have an account?<TextButton onClick={()=>setLogin(false )}>SignIn</TextButton></Text>
+        <Text>Already  have an account?<TextButton onClick={()=>setLogin(false )}>SignUp</TextButton></Text>
         </>)
           }</Right>
     </Container>
